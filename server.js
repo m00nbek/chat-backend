@@ -42,16 +42,23 @@ const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ server: server });
 wss.on("connection", function connection(ws) {
-  let data = {
+  // sending welcome message to joined user
+  let welcome = {
     sender: "Server",
     msg: "Welcome to chat!",
   };
-  ws.send(JSON.stringify(data));
-  ws.on("disconnect", () => {
-    ws.broadcast.emit("user-disconnected", users[socket.id]);
-    delete users[socket.id];
+  ws.send(JSON.stringify(welcome));
+  // sending New user joined message to all of the users
+  let newUserJoined = {
+    sender: "Server",
+    msg: "A new user joined to chat!",
+  };
+  wss.clients.forEach(function each(client) {
+    if (client !== ws && client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(newUserJoined));
+    }
   });
-
+  // handling message
   ws.on("message", function incoming(message) {
     console.log("received: %s", message);
 

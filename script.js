@@ -35,13 +35,25 @@ const socket = new WebSocket("ws://localhost:3300");
 
 // Listen for messages
 socket.addEventListener("message", function (event) {
-  var reader = new FileReader();
-  reader.addEventListener("loadend", function () {
-    var response = JSON.parse(reader.result);
-    appendMessage(`${response.sender}: ${response.msg}`);
-  });
-  reader.readAsText(event.data);
+    if (typeof event.data == Blob | typeof event.data == 'object') {
+        console.log("Blob type")
+        var reader = new FileReader();
+        reader.addEventListener("loadend", function () {
+          var response = JSON.parse(reader.result);
+          appendMessage(`${response.sender}: ${response.msg}`);
+        });
+        reader.readAsText(event.data);
+    } else {
+        console.log("not Blob type")
+        var data = JSON.parse(event.data);
+        appendMessage(`${data.sender}: ${data.msg}`);
+    }
 });
+
+// listen for open
+// socket.onopen = function() {
+    
+// }
 
 // get user's name
 const name = prompt("What is your name?");
